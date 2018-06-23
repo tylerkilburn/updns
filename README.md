@@ -27,8 +27,7 @@ You can specify standard domains, or utilize [regular expressions](https://www.r
 bind              0.0.0.0:53     # address => port (requires restarting the service)
 proxy             8.8.8.8        # proxy => DNS Server
 google.com        1.1.1.1        # domain => IP
-yahoo.com         2.2.2.2
-/goo+gle\.com/    3.3.3.3        # regex: gooooooooooogle.com => IP
+/goo+gle\.com/    2.2.2.2        # regex: gooooooooooogle.com => IP
 ```
 #### Start to use
 ```
