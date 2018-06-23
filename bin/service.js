@@ -1,6 +1,7 @@
 
 
 const fs = require('fs')
+const net = require('net')
 const path = require('path')
 const log = require('./log')
 const hostsConfigPath = path.join(__dirname, './../config/hosts')
@@ -12,19 +13,23 @@ var bind = {
 }
 const proxy = []
 
-const meta = new RegExp('\/(.*)\/')  // regex to find regex (the slashes are escaped on purpose because we're matching the regex markings themselves)
+// regex to find regex (the slashes are escaped on purpose because we're matching the regex markings themselves)
+const meta = new RegExp('\/(.*)\/')  
 var hosts
 
 function validateDomain (dom, ipaddr) {
+
     // google.com    8.8.8.8    # domain => ip
     // check for a valid hostname (per RFC 1034)
     // first character is a letter, middle is letters/digits/hyphens, last character is a letter or digit
     // each section must be 63 characters or less in length, with the entire domain no greater than 253
     // 253 bytes for the textual name, plus the trailing '.', and another byte to record the length = 255 max
     // https://tools.ietf.org/html/rfc1034#section-3.5
-    let hostReg = /^((?:[a-z]+[a-z|0-9|-]{0,61}[a-z|0-9]\.)+[(a-z)]+)$/i
+
+    let hostReg = /^(?=^.{3,255}$)[a-z0-9][-a-z0-9]{0,62}(\.[a-z0-9][-a-z0-9]{0,62})+$/
 
     return (dom.length <= 253 && hostReg.test(dom)) ? (ipaddr || dom) : false
+
 }
 
 function updateHosts () {
@@ -33,7 +38,8 @@ function updateHosts () {
         .split('\n')
         .map(host => {
 
-            if(/^\s*#.+$/.test(host)) {
+            // Invalid content
+            if(/^\s?(#.*|\s?)+$/.test(host)) {
                 return false
             }
 
@@ -54,16 +60,17 @@ function updateHosts () {
                 return false
             }
 
-            let ipReg = /^((?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])(?:\.(?:\d{1,2}|1\d\d|2[0-4]\d|25[0-5])){3})$/ // matches a valid ip
-
+            // must specify a domain and ip
             let rowParts = host.trim().replace(/\s\s+/g, ' ').split(' ')
-            if (rowParts.length < 2) return false // must specify a domain and ip
+            if (rowParts.length < 2) return false 
 
             // /(.*\.)?goo+gle?\.(?:com|net|org)/    127.0.0.1    # dyanmic-domain (eg: gooooooooooooooogle.com) => ip
-            let customRegEx = meta.exec(rowParts[0]) // allow the user to specify their own regex for dynamic matching
+            // allow the user to specify their own regex for dynamic matching
+            let customRegEx = meta.exec(rowParts[0])
             let theHost = customRegEx ? new RegExp(customRegEx[1], 'i') : validateDomain(rowParts[0])
 
-            let theIP = ipReg.exec(rowParts[1]) ? rowParts[1] : false // check for a valid IP address
+            // check for a valid IP address
+            let theIP = net.isIP(rowParts[1]) ? rowParts[1] : false 
 
             if(theHost && theIP) return {
                 ip: theIP,
