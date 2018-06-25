@@ -3,6 +3,7 @@
   "version": "1.2.2",
   "description": "DNS proxy tools, you can intercept any domain name and return any ip you need",
   "main": "index.js",
+  "typings": "typing/updns.d.ts",
   "scripts": {
     "dev": "sudo ./bin/updns start develop",
     "test": "ava ./test/ --verbose",
