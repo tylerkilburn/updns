@@ -6,10 +6,9 @@ const path = require('path')
 const daemon = require('./../bin/daemon')
 
 
-test.cb('Creating a daemon', t => {
+test.cb('Creating daemon', t => {
 
     t.plan(2)
-
     const testFilePath = path.join(__dirname, './process.test.js')
 
     fs.writeFileSync(testFilePath, `
@@ -35,18 +34,22 @@ test.cb('Creating a daemon', t => {
 })
 
 
-test.todo('Spawn process')
+test('Spawn process', async t => {
 
-// test.cb('Spawn process', t => {
+    t.plan(2)
+    await daemon.spawn('touch', 'test.txt')
 
-//     t.plan(1)
-//     daemon.spawn('vim', path.join(__dirname, './index.test.js')).then(child => {
-//         console.log(child)
-//         t.end()
-//     }).catch(e => {
+    await daemon.spawn('rm-error').catch(e => {
+        t.is(e.path, 'rm-error')
+    })
 
-//     })
-    
-// })
+    await daemon.spawn('rm', '-rf', 'test.txt').then(child => {
+        t.is(typeof child.pid, 'number')
+    })
+
+})
+
+
+test.todo('Kill process')
 
 

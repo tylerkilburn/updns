@@ -9,16 +9,18 @@ const logPath = path.join(__dirname, './../log/updns.log')
 
 test('Write log', async t => {
 
-    Number.prototype[Symbol.iterator] = function * () {
-        for(let i = 0; i <= this - 1; i++) yield i
-    }
 
-    const count = [...1000]
+    const count = 1000
     log.write(Date.now())
 
     await new Promise(waiting => setTimeout(() => {
-        count.map(() => log.write(Date.now()))
+
+        Array.from({
+            length: count
+        }).forEach(() => log.write(Date.now()))
+        
         waiting()
+        
     }, 10))
 
     const logs = new Promise(success => setTimeout(() => {
@@ -32,7 +34,7 @@ test('Write log', async t => {
 
     }, 100))
 
-    t.is(await logs, count.length + 2)
+    t.is(await logs, count + 2)
 
 })
 
