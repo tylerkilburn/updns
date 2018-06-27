@@ -52,45 +52,28 @@ command.on('stop', over => {
 
         } else {
 
-            try {
-                // Does the process exist ?
-                process.kill(pid, 0)
+            daemon.killProcess(pid).then(() => {
 
-                try {
-                    
-                    daemon.killProcess(pid)
-                    fs.unlinkSync(pidConfigPath)
-                    over &&
-                        over()
+                fs.unlinkSync(pidConfigPath)
+                over && over()
 
-                }catch(env) {
-                    error(env)
+            }).catch(code => {
+
+                switch (code) {
+                case 0 :
+                    console.log('\x1b[31mupdns: Can\'t find the service that is running\x1b[0m')
+                    return
+                case -1 :
+                    console.log('\x1b[31mupdns: Please make sure that you have sufficient authority, Or use \'sudo updns stop\'\x1b[0m')
+                    return
+                default :
+                    console.log(`\x1b[31mupdns: code ${code}\x1b[0m`)
                 }
 
-            }catch(env) {
-                error(env)
-            }
-
+            })
         }
+
     })
-
-    function error(e) {
-
-        if(e.code === 'ESRCH'){
-
-            console.log('\x1b[31mupdns: Can\'t find the service that is running\x1b[0m')
-
-        }else if(e.code === 'EPERM'){
-            
-            console.log('\x1b[31mupdns: Please make sure that you have sufficient authority, Or use \'sudo updns stop\'\x1b[0m')
-
-        }else {
-
-            console.log(`\x1b[31mupdns: ${e.code}\x1b[0m`)
-            
-        }
-
-    }
 
 })
 

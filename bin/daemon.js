@@ -23,18 +23,41 @@ module.exports.createProcess = filePath => {
 }
 
 
-module.exports.killProcess = pid => {
+module.exports.killProcess = pid => new Promise((success, fail) => {
 
-    process.kill(pid)
+    function error(e) {
+        if(e.code === 'ESRCH'){
+            return 0
+        }else if(e.code === 'EPERM'){
+            return -1
+        }else {
+            return e.code
+        }
+    }
 
-}
+    try {
+        // Does the process exist ?
+        process.kill(pid, 0)
+        
+        try {
+            process.kill(pid)
+            success()
+        }catch(env) {
+            fail(error(env))
+        }
+
+    }catch(env) {
+        fail(error(env))
+    }
+
+})
 
 
-module.exports.spawn = (processName, argv) => {
+module.exports.spawn = (processName, ...argv) => {
 
     return new Promise((suc, err) => {
 
-        const child = child_process.spawn(processName, [ argv ], {
+        const child = child_process.spawn(processName,  argv, {
             stdio: 'inherit'
         })
 
