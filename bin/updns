@@ -22,7 +22,6 @@ command.on('start', () => {
         if(message.state === 1){
 
             fs.writeFileSync(pidConfigPath, updns.pid)
-            
             isDevelop ? 
                 console.log(message.message) 
                 : 
@@ -31,10 +30,10 @@ command.on('start', () => {
         }else {
     
             console.log(`\x1b[31mupdns: ${message.message}\x1b[0m`)
+            !isDevelop && process.exit(0)
     
         }
-
-
+        
     })
 
 })
