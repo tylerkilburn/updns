@@ -28,7 +28,10 @@ test.cb('Normal proxy request', t => {
         .createServer(6666)
         .on('listening', () => {
             exec('dig @127.0.0.1 -t a google.com -p 6666 +short', (err, stdout) => {
-                t.is(net.isIP(stdout.trim()) !== 0, true)
+                err ? 
+                    t.fail(err)
+                    : 
+                    t.is(net.isIP(stdout.split('\n')[0].trim()) !== 0, true)
                 t.end()
             })
         })
