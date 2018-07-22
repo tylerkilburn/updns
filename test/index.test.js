@@ -1,27 +1,44 @@
 
 
+const exec = require('child_process').exec
 const test = require('ava')
-
-
-// Test whether the DNS service can be created
+const net = require('net')
 
 
 test.cb('Create DNS services', t => {
 
-    const updns = require('./../lib/index').createServer(1234)
-
-    updns.on('listening', () => {
-        t.pass()
-        t.end()
-    })
-
-    updns.on('error', err => {
-        t.fail(`DNS service creation failure : ${err}`)
-        t.end()
-    })
+    require('./../lib/index')
+        .createServer(1234)
+        .on('listening', () => {
+            t.end()
+        })
+        .on('error', err => {
+            t.fail(`DNS service creation failure : ${err}`)
+            t.end()
+        })
 
 })
 
-test.todo('Normal return of data')
+
+test.cb('Normal proxy request', t => {
+
+    t.plan(1)
+
+    require('./../lib/index')
+        .createServer(6666)
+        .on('listening', () => {
+            exec('dig @127.0.0.1 -t a google.com -p 6666 +short', (err, stdout) => {
+                t.is(net.isIP(stdout.trim()) !== 0, true)
+                t.end()
+            })
+        })
+        .on('message', (domain, send, proxy) => {
+            proxy('8.8.8.8')
+        })
+
+})
+
+
+test.todo('Parse the specified domain name')
 
 
