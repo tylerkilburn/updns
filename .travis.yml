@@ -19,7 +19,8 @@ cache:
     - node_modules
 
 before_install:
-  - apt-get install dnsutils
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update              ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y dnsutils ; fi
 
 script:
   # eslint
