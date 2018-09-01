@@ -11,10 +11,10 @@ updns is a DNS server developed using node, only need a simple configuration to 
 ## Running as a Service
 
 ```
-npm install -g updns
+yarn global add updns
 ```
 
-#### Config
+### Config
 
 We configure routing in the way of hosts
 
@@ -29,7 +29,8 @@ proxy             8.8.8.8        # proxy => DNS Server
 google.com        1.1.1.1        # domain => IP
 /goo+gle\.com/    2.2.2.2        # regex: gooooooooooogle.com => IP
 ```
-#### Start to use
+
+### Start to use
 ```
 updns start
 ```
@@ -37,7 +38,22 @@ You may use `sudo` to run this command because you will use the `53` port, make 
 
 Now change your local DNS server to `127.0.0.1` 🚀
 
-#### Other
+### Running in docker
+
+Create and run a container with `docker-compose`
+
+```
+docker-compose up -d
+```
+
+```
+docker attach updns
+cd /root
+./bin/updns start
+```
+
+
+### Other
 
 | Command          | Explain                                       |
 | -------------    | -------------                                 |
@@ -53,11 +69,12 @@ Now change your local DNS server to `127.0.0.1` 🚀
 ## Create DNS Server
 You can also create your DNS server as a module
 ```
-npm install updns
+yarn add updns
 ```
-If an IP address is not specified, the port will be bound globally (0.0.0.0)
+
 ```javascript
 const updns = require('updns').createServer(53, '127.0.0.1')
+// If an IP address is not specified, the port will be bound globally (0.0.0.0)
 
 updns.on('error', error => {
     console.log(error)

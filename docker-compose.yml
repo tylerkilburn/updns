@@ -1,0 +1,20 @@
+
+
+version: "3.3"
+
+services:
+
+  dns:
+    container_name: updns
+    restart: always
+    image: node
+    stdin_open: true
+    tty: true
+    privileged: true
+    ports:
+      - 53:53/udp
+    volumes:
+      - ./:/root/
+    command: /bin/bash
+
+
