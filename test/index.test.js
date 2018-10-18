@@ -6,9 +6,8 @@ const net = require('net')
 
 
 test.cb('Create DNS services', t => {
-
-    require('./../lib/index')
-        .createServer(1234)
+    const server = require('./../lib/index').createServer(1234)
+    server
         .on('listening', () => {
             t.end()
         })
@@ -16,7 +15,6 @@ test.cb('Create DNS services', t => {
             t.fail(`DNS service creation failure : ${err}`)
             t.end()
         })
-
 })
 
 
@@ -24,8 +22,8 @@ test.cb('Normal proxy request', t => {
 
     t.plan(1)
 
-    require('./../lib/index')
-        .createServer(6666)
+    const server = require('./../lib/index').createServer(6666)
+    server
         .on('listening', () => {
             exec('dig @127.0.0.1 -t a google.com -p 6666 +short', (err, stdout) => {
                 err ? 
